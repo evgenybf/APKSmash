@@ -36,7 +36,7 @@ import os
 import tempfile
 import shutil
 
-print "Starting fixstrings and apk analysis...\n"
+print("Starting fixstrings and apk analysis...\n")
 
 ##### This flag will insert debugging statements into the APK.
 JonestownThisAPK = False
@@ -108,11 +108,11 @@ doc_public_path = os.getcwd() + os.sep + "res" + os.sep + "values" + os.sep + "p
 doc_strings_path = os.getcwd() + os.sep + "res" + os.sep + "values" + os.sep + "strings.xml"
 
 if not os.path.isfile(doc_public_path):
-    print "Can not find public.xml file: " + doc_public_path
+    print("Can not find public.xml file: " + doc_public_path)
     exit();
 
 if not os.path.isfile(doc_strings_path):
-    print "Can not find strings.xml file: " + doc_strings_path
+    print("Can not find strings.xml file: " + doc_strings_path)
     exit();
 
 doc = xml.dom.minidom.parse(doc_public_path)
@@ -137,7 +137,7 @@ for node in doc.getElementsByTagName("public"):
 
     if type == 'string':
         if name in mystrings:
-            mymap[id] = { 'name': name, 'type':type, 'stringval': mystrings[name].encode('ascii', 'replace')}
+            mymap[id] = { 'name': name, 'type':type, 'stringval': mystrings[name].encode('ascii', 'replace').decode('ascii')}
         else:
             mymap[id] = { 'name': name, 'type':type, 'stringval': 'unknown'}
     else:
@@ -190,7 +190,7 @@ def get_var_from_line(line, varnumber):
     if len(method_vars) == varnumber:
         return str(method_vars[varnumber -1])
     else:
-        print "ERROR: Couldn't find the right number of vars for this method"
+        print("ERROR: Couldn't find the right number of vars for this method")
 
 
 def get_header2var(line, smalivar1, smalivar2):
@@ -296,15 +296,15 @@ isIntentFunction = False
 for f in fileList:
     #print "Searching file: " + f
 
-    if any( badpath in f for badpath in skip_classes ):
-        print "Skipping file: " + f
+    if any( badpath in f.replace('/', '\\') for badpath in skip_classes ):
+        print("Skipping file: " + f)
         continue
 
     smali_name = f
     smaliIn = open(smali_name, "r")
 
     tmp_fd, tmp_name = tempfile.mkstemp(suffix='.smalitemp')
-    smaliOut = open(tmp_name, 'w+b')
+    smaliOut = open(tmp_name, 'w')
 
     for line in smaliIn:
 
@@ -352,7 +352,7 @@ for f in fileList:
         ##### This will search for keys defined in the searchterms in the smali file
         ##### and then updates the counter data structure with the count of occurences
         ##### and there locations.
-        for key, value in searchterms.iteritems():
+        for key, value in searchterms.items():
             if line.find(key) > 0:
                 if lastsearch == smali_name and lastkey == key:
                     break
@@ -364,7 +364,7 @@ for f in fileList:
                     format_output += ' : ' + line.rstrip()
 
                 ##### Updates the counter data structure...
-                if not counter.has_key(value):
+                if value not in counter:
                     counter[value] = [0, []]
                 counter[value][0] += 1
                 counter[value][1].append(format_output)
@@ -373,13 +373,13 @@ for f in fileList:
                 lastkey = key
 
         ##### This will look for REGEX search terms
-        for key, value in regexsearchterms.iteritems():
-            if re.search(key, line) > 0:
+        for key, value in regexsearchterms.items():
+            if re.search(key, line):
                 format_output = value + " use found in: " + smali_name
                 format_output += ' : ' + line.rstrip()
 
                 ##### Updates the counter data structure...
-                if not counter.has_key(value):
+                if value not in counter:
                     counter[value] = [0, []]
                 counter[value][0] += 1
                 counter[value][1].append(format_output)
@@ -525,9 +525,9 @@ for f in fileList:
 
 
 
-print "Done Search. Writing output: " + outputfilename
+print("Done Search. Writing output: " + outputfilename)
 f = open(outputfilename, 'w')
-for key, value in counter.iteritems():
+for key, value in counter.items():
     if value[0] != 0:
 
         f.write("\n\n#################################\n" +
