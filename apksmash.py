@@ -34,6 +34,7 @@ from xml.dom.minidom import Node
 import re
 import os
 import tempfile
+import shutil
 
 print "Starting fixstrings and apk analysis...\n"
 
@@ -520,7 +521,7 @@ for f in fileList:
 	smaliOut.close()
 	os.close(tmp_fd)
 	os.remove(smali_name)
-	os.rename(tmp_name, smali_name)
+	shutil.move(tmp_name, smali_name)
 
 
 
